@@ -43,8 +43,8 @@ class Ball{
             centre_y=height/2;
             directionx=-1*directionx;
             directiony=-1*directiony;
-            speed_x=7;
-            speed_y=7;
+            speed_x=7 + 2*diff;
+            speed_y=7 +2 *diff;
 
         }
         centre_x=centre_x+ (directionx*speed_x);
@@ -116,22 +116,44 @@ int main(){
     const int screen_width = 1280;
     const int screen_height = 800;
     vector<int> score(2,0);
-    bool win =false, menu=true;
+    bool win =false, menu=true, is_q=true;
+
+    
+    InitWindow(screen_width, screen_height, "PONG!! Game");
+    SetTargetFPS(60);
+    
+    while(!IsKeyDown(KEY_T) and !IsKeyDown(KEY_S) and is_q and WindowShouldClose() == false)
+    {
+        BeginDrawing();
+        ClearBackground(BLACK);
+        DrawRectangle(screen_width/2-250,screen_height/2-110,400,50,WHITE);
+        DrawText("SINGLE PLAYER (PRESS S)",screen_width/2-200,screen_height/2-95,20,BLUE);
+        DrawRectangle(screen_width/2-250,screen_height/2,400,50,WHITE);
+        DrawText("TWO PLAYER (PRESS T)",screen_width/2-200,screen_height/2+20,20,BLUE);
+        DrawRectangle(screen_width/2-250,screen_height/2+110,400,50,WHITE);
+        DrawText("QUIT (PRESS Q)",screen_width/2-200,screen_height/2+125,20,BLUE);
+        if(IsKeyDown(KEY_Q))
+        {
+            is_q=false;
+        }
+        EndDrawing();
+    }
 
     Ball obj_ball(15,screen_width,screen_height);
     Paddle person(screen_width-30,screen_height/2-60,120,10);
     CPUPaddle pc(10,screen_height/2-60,120,10);
 
-    InitWindow(screen_width, screen_height, "PONG!! Game");
-    SetTargetFPS(60);
-    
-    
-    while (WindowShouldClose() == false){
+    while (is_q and WindowShouldClose() == false){
         BeginDrawing();
         ClearBackground(BLACK);
         if(menu==true)
         {
-            DrawRectangle(screen_width/2-150,screen_height/2-260,300,80,WHITE);
+            DrawRectangle(screen_width/2-150,screen_height/2-110,300,50,WHITE);
+            DrawText("EASY (PRESS E)",screen_width/2-90,screen_height/2-95,20,BLACK);
+            DrawRectangle(screen_width/2-150,screen_height/2,300,50,WHITE);
+            DrawText("MEDIUM (PRESS M)",screen_width/2-90,screen_height/2+20,20,BLACK);
+            DrawRectangle(screen_width/2-150,screen_height/2+110,300,50,WHITE);
+            DrawText("HARD (PRESS H)",screen_width/2-90,screen_height/2+125,20,BLACK);
             if(IsKeyDown(KEY_E))
             {
                 diff=0;
@@ -151,7 +173,6 @@ int main(){
         else if(win==false)
         {
             //Drawing task
-    
             
             DrawCircle(obj_ball.centre_x,obj_ball.centre_y,obj_ball.radius, WHITE);
             DrawRectangle(person.centre_x,person.centre_y,person.breadth,person.length,WHITE);
