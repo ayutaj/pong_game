@@ -65,8 +65,8 @@ class Paddle{
         centre_y=y;
         length=l;
         breadth=b;
-        speed_x=10;
-        speed_y=10;
+        speed_x=9;
+        speed_y=9;
     }
     void update(int h, bool r)
     {
@@ -98,9 +98,9 @@ class CPUPaddle: public Paddle{
     void update(int h,int w, Ball obj)
     {
         if( obj.centre_x < (0.30 + diff*0.1 )*w && centre_y>0 &&((centre_y + length/2 )>= obj.centre_y))
-            centre_y-=speed_y-3+ diff;
+            centre_y-=speed_y-4+ diff;
         if( obj.centre_x< (0.30 + diff*0.1) *w && centre_y+120<h &&((centre_y + length/2 )<= obj.centre_y))
-            centre_y+=speed_y-3+ diff;
+            centre_y+=speed_y-4+ diff;
     }
 };
 
@@ -164,21 +164,115 @@ void on_win(bool &mm, vector<int> &score, bool &win, bool &is_s, bool &is_t)
 
 }
 
+
+void single_player(Ball &obj_ball, Paddle &person, Paddle &person2, CPUPaddle &pc,bool &mm, bool &win, bool &is_s, bool &is_t,vector<int> &score,bool &menu)
+{
+    const int screen_width = 1280;
+    const int screen_height = 800;
+    if(menu==true)
+    {
+        DrawRectangle(screen_width/2-150,screen_height/2-110,300,50,WHITE);
+        DrawText("EASY (PRESS E)",screen_width/2-90,screen_height/2-95,20,BLACK);
+        DrawRectangle(screen_width/2-150,screen_height/2,300,50,WHITE);
+        DrawText("MEDIUM (PRESS M)",screen_width/2-90,screen_height/2+20,20,BLACK);
+        DrawRectangle(screen_width/2-150,screen_height/2+110,300,50,WHITE);
+        DrawText("HARD (PRESS H)",screen_width/2-90,screen_height/2+125,20,BLACK);
+        if(IsKeyDown(KEY_E))
+        {
+            diff=0;
+            menu=false;
+        }
+        if(IsKeyDown(KEY_M))
+        {
+            diff=1;
+            obj_ball.update(screen_height,screen_width,score,win);
+            menu=false;
+        }
+        if(IsKeyDown(KEY_H))
+        {
+            diff=2;
+            obj_ball.update(screen_height,screen_width,score,win);
+            menu=false;
+        }
+    }
+    else if(win==false)
+    {
+        //Drawing task
+        
+        DrawCircle(obj_ball.centre_x,obj_ball.centre_y,obj_ball.radius, WHITE);
+        DrawRectangle(person.centre_x,person.centre_y,person.breadth,person.length,WHITE);
+        DrawRectangle(pc.centre_x,pc.centre_y,pc.breadth,pc.length,WHITE);
+        DrawLine(screen_width/2,0,screen_width/2,screen_height,WHITE);
+
+        //Updating ball and paddle
+        obj_ball.update(screen_height,screen_width,score,win);
+        person.update(screen_height,true);
+        pc.update(screen_height,screen_width,obj_ball);
+
+        //Checking collision
+        checking_collisionabyme(obj_ball,person,pc,person2,score,win,is_s);
+
+        DrawText(TextFormat("%i",score[0]),screen_width/4-20,20,80,WHITE);
+        DrawText(TextFormat("%i",score[1]),3*screen_width/4-20,20,80,WHITE);
+    }
+    else if(win ==true)
+            {
+                on_win(mm,score,win, is_s, is_t);
+                
+            }
+        
+}
+
+void two_player(Ball &obj_ball, Paddle &person, Paddle &person2, CPUPaddle &pc,bool &mm, bool &win, bool &is_s, bool &is_t,vector<int> &score)
+{
+    const int screen_width = 1280;
+    const int screen_height = 800;
+       if(win==false)
+            {
+                //Drawing task
+                DrawCircle(obj_ball.centre_x,obj_ball.centre_y,obj_ball.radius, WHITE);
+                DrawRectangle(person.centre_x,person.centre_y,person.breadth,person.length,WHITE);
+                DrawRectangle(person2.centre_x,person2.centre_y,person2.breadth,person2.length,WHITE);
+                DrawLine(screen_width/2,0,screen_width/2,screen_height,WHITE);
+
+                //Updating ball and paddle
+                obj_ball.update(screen_height,screen_width,score,win);
+                person.update(screen_height,true);
+                person2.update(screen_height,false);
+
+
+                //Checking collision
+                checking_collisionabyme(obj_ball,person,pc,person2,score,win,is_s);
+
+                DrawText(TextFormat("%i",score[0]),screen_width/4-20,20,80,WHITE);
+                DrawText(TextFormat("%i",score[1]),3*screen_width/4-20,20,80,WHITE);
+            }
+            else if(win ==true)
+            {
+                on_win(mm,score,win,is_s,is_t);
+            }
+}
+
 int main(){
 
+    //declaring variables
     const int screen_width = 1280;
     const int screen_height = 800;
     vector<int> score(2,0);
     bool win =false, menu=true, is_q=true, is_t=false, is_s=false, mm=true;
 
     
+    //initating window
     InitWindow(screen_width, screen_height, "PONG!! Game");
     SetTargetFPS(60);
 
+    //declaring objects
     Ball obj_ball(15,screen_width,screen_height);
     Paddle person(screen_width-30,screen_height/2-60,120,10);
     Paddle person2(30,screen_height/2-60,120,10);
     CPUPaddle pc(30,screen_height/2-60,120,10);
+    
+    //Game LOOP
     while (WindowShouldClose() == false and !IsKeyDown(KEY_Q))
     {
         
@@ -213,84 +307,11 @@ int main(){
 
         if(mm==false and is_s)
         {
-            if(menu==true)
-            {
-                DrawRectangle(screen_width/2-150,screen_height/2-110,300,50,WHITE);
-                DrawText("EASY (PRESS E)",screen_width/2-90,screen_height/2-95,20,BLACK);
-                DrawRectangle(screen_width/2-150,screen_height/2,300,50,WHITE);
-                DrawText("MEDIUM (PRESS M)",screen_width/2-90,screen_height/2+20,20,BLACK);
-                DrawRectangle(screen_width/2-150,screen_height/2+110,300,50,WHITE);
-                DrawText("HARD (PRESS H)",screen_width/2-90,screen_height/2+125,20,BLACK);
-                if(IsKeyDown(KEY_E))
-                {
-                    diff=0;
-                    menu=false;
-                }
-                if(IsKeyDown(KEY_M))
-                {
-                    diff=1;
-                    obj_ball.update(screen_height,screen_width,score,win);
-                    menu=false;
-                }
-                if(IsKeyDown(KEY_H))
-                {
-                    diff=2;
-                    obj_ball.update(screen_height,screen_width,score,win);
-                    menu=false;
-                }
-            }
-            else if(win==false)
-            {
-                //Drawing task
-                
-                DrawCircle(obj_ball.centre_x,obj_ball.centre_y,obj_ball.radius, WHITE);
-                DrawRectangle(person.centre_x,person.centre_y,person.breadth,person.length,WHITE);
-                DrawRectangle(pc.centre_x,pc.centre_y,pc.breadth,pc.length,WHITE);
-                DrawLine(screen_width/2,0,screen_width/2,screen_height,WHITE);
-
-                //Updating ball and paddle
-                obj_ball.update(screen_height,screen_width,score,win);
-                person.update(screen_height,true);
-                pc.update(screen_height,screen_width,obj_ball);
-
-                //Checking collision
-                checking_collisionabyme(obj_ball,person,pc,person2,score,win,is_s);
-
-                DrawText(TextFormat("%i",score[0]),screen_width/4-20,20,80,WHITE);
-                DrawText(TextFormat("%i",score[1]),3*screen_width/4-20,20,80,WHITE);
-            }
-            else if(win ==true)
-            {
-                on_win(mm,score,win, is_s, is_t);
-                
-            }
+            single_player(obj_ball,  person,  person2, pc,mm, win, is_s, is_t,score,menu);
         }
         if(mm ==false and is_t)
         {
-            if(win==false)
-            {
-                //Drawing task
-                DrawCircle(obj_ball.centre_x,obj_ball.centre_y,obj_ball.radius, WHITE);
-                DrawRectangle(person.centre_x,person.centre_y,person.breadth,person.length,WHITE);
-                DrawRectangle(person2.centre_x,person2.centre_y,person2.breadth,person2.length,WHITE);
-                DrawLine(screen_width/2,0,screen_width/2,screen_height,WHITE);
-
-                //Updating ball and paddle
-                obj_ball.update(screen_height,screen_width,score,win);
-                person.update(screen_height,true);
-                person2.update(screen_height,false);
-
-
-                //Checking collision
-                checking_collisionabyme(obj_ball,person,pc,person2,score,win,is_s);
-
-                DrawText(TextFormat("%i",score[0]),screen_width/4-20,20,80,WHITE);
-                DrawText(TextFormat("%i",score[1]),3*screen_width/4-20,20,80,WHITE);
-            }
-            else if(win ==true)
-            {
-                on_win(mm,score,win,is_s,is_t);
-            }
+            two_player(obj_ball,  person,  person2, pc,mm, win, is_s, is_t,score);
         }
        
         EndDrawing();
