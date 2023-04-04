@@ -9,11 +9,24 @@ Tested on both Windows 10 and Windows 11.
 # Video Tutorial
 
 <p align="center">
-  <img src="preview.jpg" alt="" width="800">
+  <img src="preview1.jpg" alt="" width="800">
 </p>
-
+<br>
+<br>
 <p align="center">
-🎥 <a href="https://www.youtube.com/watch?v=PaAcVk5jUd8">Video Tutorial on YouTube</a>
+  <img src="preview2.jpg" alt="" width="800">
 </p>
+<br>
+<br>
+<p align="center">
+  <img src="preview3.jpg" alt="" width="800">
+</p>
+<br>
+<br>
+<p align="center">
+  <img src="preview4.jpg" alt="" width="800">
+</p>
+<br>
+<br>
 
 
